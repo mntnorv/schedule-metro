@@ -6,7 +6,7 @@ A ModernUI-style class schedule app, written in C#, WPF.
 Build
 -----
 
-**This is a development version, which may or may not build and/or work.**
+**This is a development version, which may or may not compile and/or work.**
 
 Built using Visual Studio 2012 Professional with NuGet package manager extension. Not tested on other configurations.
 
