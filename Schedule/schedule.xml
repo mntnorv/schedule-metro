@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<types>
+		<type name="Teorija" code="t" color="E51400" />
+		<type name="Praktika" code="p" color="1BA1E2" />
+		<type name="Laboratorinis" code="l" color="A2C139" />
+	</types>
+	
+	<modules>
+		<module name="Fizika 2" code="P230B202" />
+		<module name="Diskrečiosios struktūros" code="P170B008" />
+		<module name="Taikomoji matematika" code="P001B010" />
+		<module name="Duomenų struktūros" code="P175B126" />
+		<module name="Anglų kalba" code="H570B014" />
+	</modules>
+	
+	<groups>
+		<groupContainer name="Anglų grupė" appliesTo="H570B014">
+			<group name="A13" code="A13" />
+			<group name="A12" code="A12" />
+		</groupContainer>
+	</groups>
+	
+	<schedule semesterStart="2012-09-03">
+		<weekday number="0">
+			<class code="P230B202" location="232" time="10:30" type="t" />
+			<class code="P230B202" location="240" time="13:00" type="l" />
+			<class code="P001B010" location="312" time="15:00" type="l" />
+			<class code="P170B008" location="B305" time="17:00" type="l" />
+		</weekday>
+		<weekday number="1">
+			<class code="P001B010" location="DT153" time="10:30" type="t" />
+			<class code="H570B014" location="D401" time="13:00" type="p" group="A12" />
+			<class code="H570B014" location="D402" time="13:00" type="p" group="A13" />
+			<class code="P230B202" location="523" time="15:00" type="p" week="1" />
+		</weekday>
+		<weekday number="2">
+			<class code="P175B126" location="SC103CD" time="8:30" type="l" />
+			<class code="P175B126" location="DT153" time="10:30" type="t" />
+			<class code="H570B014" location="B202" time="13:00" type="p" week="1" group="A13" />
+		</weekday>
+		<weekday number="3">
+			<class code="P170B008" location="DT150" time="9:00" type="t" />
+			<class code="P175B126" location="SC103AB" time="13:00" type="l" week="1" />
+			<class code="H570B014" location="K207" time="13:00" type="p" week="2" group="A13" />
+			<class code="H570B014" location="B102" time="15:00" type="p" group="A12" />
+		</weekday>
+		<weekday number="4">
+			<class code="H570B014" location="K207" time="10:30" type="p" week="2" group="A12" />
+		</weekday>
+	</schedule>
+</data>

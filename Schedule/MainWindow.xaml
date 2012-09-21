@@ -1,0 +1,89 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Behaviours="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="Schedule.MainWindow"
+        Title="Tvarkaraštis"
+        Height="350"
+        Width="525"
+        ResizeMode="CanMinimize"
+        Loaded="MetroWindow_Loaded"
+        Icon="Icons/icon.png">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="FlatButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <i:Interaction.Behaviors>
+        <Behaviours:BorderlessWindowBehavior ResizeWithGrip="False" />
+    </i:Interaction.Behaviors>
+
+    <Controls:MetroContentControl>
+        <Grid>
+            <!-- Title bar rectangle -->
+            <Rectangle x:Name="titleRect" Width="525" Height="30" Fill="#CC119EDA" VerticalAlignment="Top" MouseLeftButtonDown="DragEvent" />
+
+            <!-- Title and icon -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="DragEvent" >
+                <Image Source="Icons/icon.png" Stretch="None" />
+                <Label Content="TVARKARAŠTIS" Height="30" Foreground="#99ffffff" FontSize="16" TextOptions.TextFormattingMode="Display" FontWeight="SemiBold" />
+            </StackPanel>
+
+            <!-- Main panel -->
+            <DockPanel LastChildFill="True" Margin="0,30,0,0">
+                <!-- Tab bar -->
+                <Grid DockPanel.Dock="Top" Background="#CC119EDA" Height="36" MouseLeftButtonUp="TabChangeEvent" >
+                    <Image x:Name="tabImage" Source="Icons/metroTab.png" HorizontalAlignment="Left" Stretch="None" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5" Margin="-16,0,0,0" />
+                    <Label x:Name="todayLabel" Content="ŠIANDIEN" FontSize="18" Margin="0,0,260,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" />
+                    <Label x:Name="tomorrowLabel" Content="RYTOJ" FontSize="18" Margin="260,0,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" />
+                </Grid>
+                <Controls:MetroContentControl x:Name="metroClassesControl">
+                    <DockPanel>
+                        <StackPanel x:Name="classesStackPanel" HorizontalAlignment="Stretch" Margin="0,15,0,0"/>
+                        <Image x:Name="emptyImage" Source="Icons/emptyIcon.png" Stretch="None" Visibility="Hidden" />
+                    </DockPanel>
+                </Controls:MetroContentControl>
+            </DockPanel>
+
+            <!-- Settings panel -->
+            <Grid x:Name="settingsPanel" Background="#e5000000" Height="350" Margin="0,0,0,350">
+                <Label Content="&#xF013;"
+        			   HorizontalAlignment="Left"
+        			   VerticalAlignment="Top"
+        			   Foreground="#33000000"
+        			   FontFamily="/Schedule;component/Fonts/#FontAwesomeRegular"
+        			   FontSize="150"
+                       Margin="20,10,0,0" />
+                
+                <!--<DatePicker Name="datePicker" Width="150" Height="22" Margin="10, 30, 0, 0" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedDateChanged="datePicker_SelectedDateChanged" />-->
+
+                <StackPanel Name="settingsStackPanel" HorizontalAlignment="Center" VerticalAlignment="Center"></StackPanel>
+
+                <!-- Version info -->
+                <Label Content="Schedule 0.6a" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+
+                <!-- Dragable rectangle at the top -->
+                <Rectangle Width="525" Height="30" Fill="#00000000" VerticalAlignment="Top" MouseLeftButtonDown="DragEvent"/>
+            </Grid>
+
+            <!-- Windows commands (close, minimize, settings) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Content="&#xF021;" Width="40" Height="30" Click="RefreshButton_Click" FontFamily="/Schedule;component/Fonts/#FontAwesomeRegular" />
+                <Button x:Name="settingsButton" Content="&#xF078;" Click="SettingsButton_Click" Width="40" Height="30" FontFamily="/Schedule;component/Fonts/#FontAwesomeRegular" />
+                <Button Content="0" Click="MinimizeButton_Click" FontFamily="Marlett" Width="40" Height="30" />
+                <Button Content="r" Click="CloseButton_Click" FontFamily="Marlett" Width="40" Height="30" />
+            </StackPanel>
+        </Grid>
+    </Controls:MetroContentControl>
+</Window>
