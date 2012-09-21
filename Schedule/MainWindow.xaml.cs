@@ -340,21 +340,14 @@ namespace Schedule
             if (File.Exists(appDataDir + scheduleName + scheduleExt))
                 e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
             else
+            {
                 e.Result = null;
+            }
         }
 
         private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Result != null)
-            {
-                data = (e.Result as Data).Clone() as Data;
-            }
-            else
-            {
-                MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                PrepareSettings(data);
-                ShowClasses(data, groupSettings, DateTime.Now);
-            }
+            data = e.Result as Data;
 
             if (data != null && (!data.Equals(new Data())))
             {
