@@ -4,3 +4,6 @@ Schedule/obj
 
 # mstest test results
 Schedule/TestResults
+
+# Readme .html preview
+README-*
