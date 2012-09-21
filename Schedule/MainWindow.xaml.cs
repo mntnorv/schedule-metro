@@ -22,15 +22,24 @@ namespace Schedule
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Dynamic global variables
         private Data data;
         private GroupSettings groupSettings;
 
         private int currentTabState;
         private int currentSettingsState;
-        private char openMenu = '\uf078';
-        private char closeMenu = '\uf077';
 
         private BackgroundWorker bgWorker;
+
+        private string remoteScheduleDir;
+        private string appDataDir;
+        private string scheduleName;
+
+        // Constant variables
+        private const char openMenu = '\uf078';
+        private const char closeMenu = '\uf077';
+        private const string scheduleExt = ".xml";
+        private const string hashExt = ".hash";
 
         public MainWindow()
         {
@@ -43,16 +52,16 @@ namespace Schedule
 
             bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
             bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
+
+            remoteScheduleDir = "http://www.daukantas.kaunas.lm.lt/schedule/";
+            appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\MetroSchedule\\";
+            scheduleName = "schedule";
         }
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\MetroSchedule\\";
-
             if (!Directory.Exists(appDataDir))
                 Directory.CreateDirectory(appDataDir);
-
-            UpdateSchedule("http://www.daukantas.kaunas.lm.lt/min/", appDataDir, "schedule");
 
             bgWorker.RunWorkerAsync();
         }
@@ -61,18 +70,18 @@ namespace Schedule
         {
             bool download = true;
 
-            if (File.Exists(localDir + name + ".hash"))
+            if (File.Exists(localDir + name + hashExt))
             {
                 try
                 {
                     string remoteHash;
                     string localHash;
 
-                    StreamReader remote = new StreamReader(WebRequest.Create(url + name + ".hash").GetResponse().GetResponseStream());
+                    StreamReader remote = new StreamReader(WebRequest.Create(url + name + hashExt).GetResponse().GetResponseStream());
                     remoteHash = remote.ReadLine();
                     remote.Close();
 
-                    StreamReader local = new StreamReader(localDir + name + ".hash");
+                    StreamReader local = new StreamReader(localDir + name + hashExt);
                     localHash = local.ReadLine();
                     local.Close();
 
@@ -91,8 +100,8 @@ namespace Schedule
                 {
                     WebClient client = new WebClient();
 
-                    client.DownloadFile(url + name + ".hash", localDir + name + ".hash");
-                    client.DownloadFile(url + name + ".xml", localDir + name + ".xml");
+                    client.DownloadFile(url + name + hashExt, localDir + name + hashExt);
+                    client.DownloadFile(url + name + scheduleExt, localDir + name + scheduleExt);
                 }
                 catch (Exception e)
                 {
@@ -220,7 +229,7 @@ namespace Schedule
 
             try
             {
-                bool temp = (new Ping()).Send("www.google.com").Status == IPStatus.Success;
+                isInternetAvailable = (new Ping()).Send("www.google.com").Status == IPStatus.Success;
             }
             catch (PingException e)
             {
@@ -323,14 +332,39 @@ namespace Schedule
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            e.Result = ReadClasses("http://www.daukantas.kaunas.lm.lt/min/schedule.xml");
+            if (CheckInternetConnection())
+                UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
+            else
+                MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            if (File.Exists(appDataDir + scheduleName + scheduleExt))
+                e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
+            else
+                e.Result = null;
         }
 
         private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            data = (e.Result as Data).Clone() as Data;
-            PrepareSettings(data);
-            ShowClasses(data, groupSettings, DateTime.Now);
+            if (e.Result != null)
+            {
+                data = (e.Result as Data).Clone() as Data;
+            }
+            else
+            {
+                MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                PrepareSettings(data);
+                ShowClasses(data, groupSettings, DateTime.Now);
+            }
+
+            if (data != null && (!data.Equals(new Data())))
+            {
+                PrepareSettings(data);
+                ShowClasses(data, groupSettings, DateTime.Now);
+            }
+            else
+            {
+                MessageBox.Show("Loading schedule failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion
