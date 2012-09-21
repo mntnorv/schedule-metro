@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -39,7 +40,7 @@ namespace Schedule
             currentSettingsState = 0;
 
             bgWorker = new BackgroundWorker();
-            
+
             bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
             bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
         }
@@ -53,14 +54,7 @@ namespace Schedule
 
             UpdateSchedule("http://www.daukantas.kaunas.lm.lt/min/", appDataDir, "schedule");
 
-            try
-            {
-                bgWorker.RunWorkerAsync();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
+            bgWorker.RunWorkerAsync();
         }
 
         private void UpdateSchedule(string url, string localDir, string name)
@@ -87,7 +81,7 @@ namespace Schedule
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message);
+                    MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -102,7 +96,7 @@ namespace Schedule
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message);
+                    MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -137,7 +131,7 @@ namespace Schedule
                 {
                     if (scheduleToday[i].Week == 0 || scheduleToday[i].Week == currentWeekCode)
                     {
-                        string setting = groupSettings.GetSettingByCode (scheduleToday[i].Code);
+                        string setting = groupSettings.GetSettingByCode(scheduleToday[i].Code);
 
                         if (setting == scheduleToday[i].Group)
                         {
@@ -176,7 +170,7 @@ namespace Schedule
                 List<string> settingNames = new List<string>();
 
                 foreach (Group group in i.Items)
-                    settingNames.Add (group.Name);
+                    settingNames.Add(group.Name);
 
                 Setting setting = new Setting(i.Name, settingNames);
                 setting.CurrentSetting = groupSettings.Settings[groupSettings.Settings.Count - 1];
@@ -199,14 +193,7 @@ namespace Schedule
         {
             XmlTextReader reader = null;
 
-            try
-            {
-                reader = new XmlTextReader(fileName);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
+            reader = new XmlTextReader(fileName);
 
             Data data = new Data();
 
@@ -227,9 +214,20 @@ namespace Schedule
             return data;
         }
 
-        private void DownloadData(string Url, Data data)
+        private bool CheckInternetConnection()
         {
-            data = ReadClasses(Url);
+            bool isInternetAvailable = false;
+
+            try
+            {
+                bool temp = (new Ping()).Send("www.google.com").Status == IPStatus.Success;
+            }
+            catch (PingException e)
+            {
+                return false;
+            }
+
+            return isInternetAvailable;
         }
 
         #region Events
@@ -325,28 +323,14 @@ namespace Schedule
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            try
-            {
-                e.Result = ReadClasses("http://www.daukantas.kaunas.lm.lt/min/schedule.xml");
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message);
-            }
+            e.Result = ReadClasses("http://www.daukantas.kaunas.lm.lt/min/schedule.xml");
         }
 
         private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            try
-            {
-                data = (e.Result as Data).Clone() as Data;
-                PrepareSettings(data);
-                ShowClasses(data, groupSettings, DateTime.Now);
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message);
-            }
+            data = (e.Result as Data).Clone() as Data;
+            PrepareSettings(data);
+            ShowClasses(data, groupSettings, DateTime.Now);
         }
 
         #endregion
