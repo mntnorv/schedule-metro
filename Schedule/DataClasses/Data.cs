@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace Schedule.DataClasses
 {
-    class Data : ICloneable
+    class Data
     {
         private ClassTypes types;
         private Modules modules;
@@ -56,11 +56,6 @@ namespace Schedule.DataClasses
                     break;
                 }
             }
-        }
-
-        public object Clone()
-        {
-            return this.MemberwiseClone();
         }
 
         public ClassTypes Types
