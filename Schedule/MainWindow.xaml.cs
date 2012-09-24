@@ -69,6 +69,7 @@ namespace Schedule
         private void UpdateSchedule(string url, string localDir, string name)
         {
             bool download = true;
+            bool showWarning = false;
 
             if (File.Exists(localDir + name + hashExt))
             {
@@ -90,7 +91,8 @@ namespace Schedule
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    showWarning = true;
+                    //MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -105,9 +107,22 @@ namespace Schedule
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    showWarning = true;
+                    //MessageBox.Show("Updating schedule failed:\r\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
+            SetOutOfDateWarningVisible(showWarning);
+        }
+
+        private void SetOutOfDateWarningVisible(bool visibility)
+        {
+            if (visibility)
+                outOfDateWarning.Dispatcher.BeginInvoke(
+                    (Action)(() => { outOfDateWarning.Visibility = Visibility.Visible; }));
+            else
+                outOfDateWarning.Dispatcher.BeginInvoke(
+                    (Action)(() => { outOfDateWarning.Visibility = Visibility.Hidden; }));
         }
 
         private void ShowClasses(Data data, GroupSettings groupSettings, DateTime date)
@@ -335,7 +350,10 @@ namespace Schedule
             if (CheckInternetConnection())
                 UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
             else
-                MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            {
+                //MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                SetOutOfDateWarningVisible(true);
+            }
 
             if (File.Exists(appDataDir + scheduleName + scheduleExt))
                 e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);

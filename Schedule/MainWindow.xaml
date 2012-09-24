@@ -79,7 +79,7 @@
 
             <!-- Windows commands (close, minimize, settings) -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                <TextBlock x:Name="upToDateWarning" Text="&#xF071;" FontSize="18" Width="40" FontFamily="/Schedule;component/Fonts/#FontAwesome" Foreground="#66FFFFFF" TextAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="outOfDateWarning" Text="&#xF071;" FontSize="18" Width="40" FontFamily="/Schedule;component/Fonts/#FontAwesome" Foreground="#66FFFFFF" TextAlignment="Center" VerticalAlignment="Center" Visibility="Hidden">
                     <TextBlock.ToolTip>
                         <TextBlock Text="Schedule may not be up to date." Foreground="White" />
                     </TextBlock.ToolTip>
