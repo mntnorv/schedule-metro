@@ -29,7 +29,8 @@ namespace Schedule
         private int currentTabState;
         private int currentSettingsState;
 
-        private BackgroundWorker bgWorker;
+        private BackgroundWorker dataReadWorker;
+        private BackgroundWorker updateWorker;
 
         private string remoteScheduleDir;
         private string appDataDir;
@@ -48,10 +49,15 @@ namespace Schedule
             currentTabState = 0;
             currentSettingsState = 0;
 
-            bgWorker = new BackgroundWorker();
+            dataReadWorker = new BackgroundWorker();
 
-            bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
-            bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
+            dataReadWorker.DoWork += new DoWorkEventHandler(dataReadWorker_DoWork);
+            dataReadWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(dataReadWorker_RunWorkerCompleted);
+
+            updateWorker = new BackgroundWorker();
+
+            updateWorker.DoWork += new DoWorkEventHandler(dataReadWorker_DoWork);
+            updateWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(dataReadWorker_RunWorkerCompleted);
 
             remoteScheduleDir = "http://www.daukantas.kaunas.lm.lt/schedule/";
             appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\MetroSchedule\\";
@@ -63,7 +69,8 @@ namespace Schedule
             if (!Directory.Exists(appDataDir))
                 Directory.CreateDirectory(appDataDir);
 
-            bgWorker.RunWorkerAsync();
+            dataReadWorker.RunWorkerAsync();
+            updateWorker.RunWorkerAsync();
         }
 
         private void UpdateSchedule(string url, string localDir, string name)
@@ -86,7 +93,7 @@ namespace Schedule
                     localHash = local.ReadLine();
                     local.Close();
 
-                    if (localHash == remoteHash)
+                    if (localHash.Equals(remoteHash))
                         download = false;
                 }
                 catch (Exception e)
@@ -324,8 +331,8 @@ namespace Schedule
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!bgWorker.IsBusy)
-                bgWorker.RunWorkerAsync();
+            if (!dataReadWorker.IsBusy)
+                dataReadWorker.RunWorkerAsync();
         }
 
         void groupSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -343,17 +350,17 @@ namespace Schedule
             metroClassesControl.Visibility = Visibility.Visible;
         }
 
-        private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void dataReadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            if (CheckInternetConnection())
+            /*if (CheckInternetConnection())
                 UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
             else
             {
                 //MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 SetOutOfDateWarningVisible(true);
-            }
+            }*/
 
             if (File.Exists(appDataDir + scheduleName + scheduleExt))
                 e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
@@ -363,7 +370,7 @@ namespace Schedule
             }
         }
 
-        private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void dataReadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             data = e.Result as Data;
 
@@ -376,6 +383,43 @@ namespace Schedule
             {
                 MessageBox.Show("Loading schedule failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void updateWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            if (CheckInternetConnection())
+                UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
+            else
+            {
+                //MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                SetOutOfDateWarningVisible(true);
+            }
+
+            /*if (File.Exists(appDataDir + scheduleName + scheduleExt))
+                e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
+            else
+            {
+                e.Result = null;
+            }*/
+        }
+
+        private void updateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            data = e.Result as Data;
+
+            if (data != null && (!data.Equals(new Data())))
+            {
+                PrepareSettings(data);
+                ShowClasses(data, groupSettings, DateTime.Now);
+            }
+            else
+            {
+                MessageBox.Show("Loading schedule failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            dataReadWorker.RunWorkerAsync();
         }
 
         #endregion
