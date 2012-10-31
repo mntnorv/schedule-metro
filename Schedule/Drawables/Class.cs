@@ -69,6 +69,14 @@ namespace Schedule.Drawables
             classStackPanel.Children.Add(classLocation);
             classStackPanel.MouseEnter += new System.Windows.Input.MouseEventHandler(classStackPanel_MouseEnter);
             classStackPanel.MouseLeave += new System.Windows.Input.MouseEventHandler(classStackPanel_MouseLeave);
+            classStackPanel.MouseLeftButtonUp += classStackPanel_MouseLeftButtonUp;
+        }
+
+        void classStackPanel_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoubleAnimation animation = new DoubleAnimation(525, new Duration(TimeSpan.FromMilliseconds(500)));
+            animation.EasingFunction = new CubicEase();
+            classID.BeginAnimation(Rectangle.WidthProperty, animation);
         }
 
         void classStackPanel_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
