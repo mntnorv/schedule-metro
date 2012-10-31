@@ -56,8 +56,8 @@ namespace Schedule
 
             updateWorker = new BackgroundWorker();
 
-            updateWorker.DoWork += new DoWorkEventHandler(dataReadWorker_DoWork);
-            updateWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(dataReadWorker_RunWorkerCompleted);
+            updateWorker.DoWork += new DoWorkEventHandler(updateWorker_DoWork);
+            updateWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(updateWorker_RunWorkerCompleted);
 
             remoteScheduleDir = "http://www.daukantas.kaunas.lm.lt/schedule/";
             appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\MetroSchedule\\";
@@ -66,11 +66,16 @@ namespace Schedule
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(appDataDir))
+            if (!Directory.Exists(appDataDir) || !File.Exists(appDataDir + scheduleName + scheduleExt))
+            {
                 Directory.CreateDirectory(appDataDir);
-
-            dataReadWorker.RunWorkerAsync();
-            updateWorker.RunWorkerAsync();
+                updateWorker.RunWorkerAsync();
+            }
+            else
+            {
+                dataReadWorker.RunWorkerAsync();
+                updateWorker.RunWorkerAsync();
+            }
         }
 
         private void UpdateSchedule(string url, string localDir, string name)
@@ -223,24 +228,28 @@ namespace Schedule
         private Data ReadClasses(string fileName)
         {
             XmlTextReader reader = null;
+            Data data = null;
 
-            reader = new XmlTextReader(fileName);
-
-            Data data = new Data();
-
-            reader.MoveToContent();
-            if (reader.IsEmptyElement) { reader.Read(); return null; }
-
-            if (reader.IsStartElement() && reader.Name == "data")
+            if (File.Exists(fileName))
             {
-                data.ReadFromXml(reader);
-            }
-            else
-            {
-                throw new ArgumentException("\"" + fileName + "\" is not a valid data file");
-            }
+                reader = new XmlTextReader(fileName);
 
-            reader.Close();
+                data = new Data();
+
+                reader.MoveToContent();
+                if (reader.IsEmptyElement) { reader.Read(); return null; }
+
+                if (reader.IsStartElement() && reader.Name == "data")
+                {
+                    data.ReadFromXml(reader);
+                }
+                else
+                {
+                    throw new ArgumentException("\"" + fileName + "\" is not a valid data file");
+                }
+
+                reader.Close();
+            }
 
             return data;
         }
@@ -354,14 +363,6 @@ namespace Schedule
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            /*if (CheckInternetConnection())
-                UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
-            else
-            {
-                //MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                SetOutOfDateWarningVisible(true);
-            }*/
-
             if (File.Exists(appDataDir + scheduleName + scheduleExt))
                 e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
             else
@@ -393,32 +394,12 @@ namespace Schedule
                 UpdateSchedule(remoteScheduleDir, appDataDir, scheduleName);
             else
             {
-                //MessageBox.Show("Updating schedule failed, probably no internet connection. Using cached version.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 SetOutOfDateWarningVisible(true);
             }
-
-            /*if (File.Exists(appDataDir + scheduleName + scheduleExt))
-                e.Result = ReadClasses(appDataDir + scheduleName + scheduleExt);
-            else
-            {
-                e.Result = null;
-            }*/
         }
 
         private void updateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            data = e.Result as Data;
-
-            if (data != null && (!data.Equals(new Data())))
-            {
-                PrepareSettings(data);
-                ShowClasses(data, groupSettings, DateTime.Now);
-            }
-            else
-            {
-                MessageBox.Show("Loading schedule failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
             dataReadWorker.RunWorkerAsync();
         }
 
