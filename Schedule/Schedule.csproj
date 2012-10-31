@@ -67,6 +67,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Drawables\Class.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FlatButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -79,12 +83,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Drawables\Class.xaml.cs">
+      <DependentUpon>Class.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataClasses\Group.cs" />
     <Compile Include="DataClasses\GroupContainer.cs" />
     <Compile Include="DataClasses\Groups.cs" />
     <Compile Include="DataClasses\GroupSetting.cs" />
     <Compile Include="DataClasses\GroupSettings.cs" />
-    <Compile Include="Drawables\Class.cs" />
     <Compile Include="DataClasses\ClassType.cs" />
     <Compile Include="DataClasses\ClassTypes.cs" />
     <Compile Include="DataClasses\Data.cs" />

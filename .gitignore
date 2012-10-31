@@ -7,3 +7,6 @@ Schedule/TestResults
 
 # Readme .html preview
 README-*
+
+# .suo files
+*.suo

@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="Schedule.Drawables.Class"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="525">
+    <StackPanel x:Name="classStackPanel" Orientation="Horizontal">
+        <Rectangle x:Name="classIDRect" Fill="#FF0000" Width="10"/>
+        <Label x:Name="timeHours" Content="12" FontSize="30" FontWeight="Light" Padding="5,5,0,5"/>
+        <Label x:Name="timeMinutes" Content="34" Padding="0,5,5,5" FontSize="18" FontWeight="Light"/>
+        <Label x:Name="className" Content="Matematika" FontSize="30"/>
+        <Label x:Name="classLocation" Content="DT153" FontSize="30" FontWeight="Light"/>
+    </StackPanel>
+</UserControl>

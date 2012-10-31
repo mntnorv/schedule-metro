@@ -172,13 +172,13 @@ namespace Schedule
                         if (setting == scheduleToday[i].Group)
                         {
                             ClassType type = data.Types.GetTypeById(scheduleToday[i].Type);
-                            classesStackPanel.Children.Add((new Class(
+                            classesStackPanel.Children.Add(new Class(
                                 data.Modules.GetModuleByCode(scheduleToday[i].Code).Name,
                                 scheduleToday[i].Location,
                                 scheduleToday[i].Hours,
                                 scheduleToday[i].Minutes,
                                 new SolidColorBrush(Color.FromRgb(type.ColorArray[0], type.ColorArray[1], type.ColorArray[2]))
-                            )).Drawable);
+                            ));
 
                             zeroClasses = false;
                         }
